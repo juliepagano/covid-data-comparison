@@ -11,7 +11,7 @@ async function getUSDataByDate(date: Date) {
 }
 
 export async function getLatestUSData() {
-  const currentDate = addDays(new Date(), 1);
+  const currentDate = new Date();
 
   let res;
   try {
@@ -19,6 +19,7 @@ export async function getLatestUSData() {
     res = await getUSDataByDate(currentDate);
   } catch (e) {
     if (e?.response?.status === 404) {
+      // Try yesterday if today is not ready yet
       try {
         res = await getUSDataByDate(subDays(currentDate, 1));
       } catch (e) {
@@ -32,4 +33,19 @@ export async function getLatestUSData() {
   }
 
   throw new Error("Unable to load latest US data.");
+}
+
+export async function getStateMetadata() {
+  let res;
+  try {
+    res = await axios.get(`${BASE_URL}/states.json`);
+  } catch (e) {
+    // Something went wrong
+  }
+
+  if (res?.data?.data) {
+    return res?.data?.data;
+  }
+
+  throw new Error("Unable to load state metadata.");
 }

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { getLatestUSData } from "../services/covidTrackingService";
+import {
+  getLatestUSData,
+  getStateMetadata,
+} from "../services/covidTrackingService";
 import SquareChart from "./SquareChart";
 import get from "lodash.get";
 
@@ -29,6 +32,12 @@ interface CovidData {
   [key: string]: unknown;
 }
 
+interface ChartEntry {
+  label: string;
+  value: number;
+  source?: string;
+}
+
 const COVID_ENTRIES = [
   {
     label: "Total deaths from Covid",
@@ -41,36 +50,44 @@ const COVID_ENTRIES = [
 ];
 
 function DataContainer() {
-  const [covidData, setCovidData] = useState<CovidData>();
+  const [chartEntries, setChartEntries] = useState<ChartEntry[]>();
 
   useEffect(() => {
     async function fetchData() {
-      const result = await getLatestUSData();
-      setCovidData(result);
+      const newChartEntries: ChartEntry[] = [];
+
+      try {
+        const usResult = await getLatestUSData();
+
+        COVID_ENTRIES.forEach(({ label, dataKey }) => {
+          const value = get(usResult, dataKey);
+
+          if (typeof value === "number") {
+            newChartEntries.push({
+              label: `US ${label}`,
+              value: value,
+            });
+          }
+        });
+      } catch (e) {
+        // error
+      }
+
+      setChartEntries(newChartEntries);
     }
     fetchData();
   }, []);
 
-  if (!covidData) {
+  if (!chartEntries) {
     return null;
   }
 
   return (
     <div className="DataCharts">
-      {COVID_ENTRIES.map(({ label, dataKey }) => {
-        const value = get(covidData, dataKey);
-        console.log(covidData);
-        console.log(dataKey);
-        console.log(value);
-        console.log("-------");
-
-        if (typeof value !== "number") {
-          return null;
-        }
-
+      {chartEntries.map(({ label, value }) => {
         return (
           <SquareChart
-            key={dataKey}
+            key={label}
             label={label}
             value={value}
             scaleValue={1000}
