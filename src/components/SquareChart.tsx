@@ -6,6 +6,7 @@ import "./SquareChart.scss";
 interface SquareChartProps {
   label: string;
   value: number;
+  source?: string;
   scaleValue: number;
   color?: string;
   minWidth?: number;
@@ -34,6 +35,7 @@ const SECTION_SIZE_PX =
 function SquareChart({
   label,
   value,
+  source,
   scaleValue,
   color,
   minWidth = 250,
@@ -164,12 +166,19 @@ function SquareChart({
   return (
     <figure className="SquareChart" style={{ minWidth }}>
       <figcaption>
-        {label} (
-        {numbro(value).format({
-          thousandSeparated: true,
-          mantissa: 0,
-        })}
-        )
+        <span>
+          {label} (
+          {numbro(value).format({
+            thousandSeparated: true,
+            mantissa: 0,
+          })}
+          ){" "}
+        </span>
+        {source && (
+          <span className="SquareChart-source">
+            [<a href={source}>source</a>]
+          </span>
+        )}
       </figcaption>
       <svg width={chartWidth} height={chartHeight}>
         {renderSections(BOX_STROKE_WIDTH, BOX_STROKE_WIDTH)}

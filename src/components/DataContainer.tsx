@@ -66,6 +66,7 @@ function DataContainer() {
             newChartEntries.push({
               label: `US ${label}`,
               value: value,
+              source: "https://covidtracking.com/",
             });
           }
         });
@@ -84,12 +85,13 @@ function DataContainer() {
 
   return (
     <div className="DataCharts">
-      {chartEntries.map(({ label, value }) => {
+      {chartEntries.map(({ label, value, source }) => {
         return (
           <SquareChart
             key={label}
             label={label}
             value={value}
+            source={source}
             scaleValue={1000}
             color="blue"
           />
