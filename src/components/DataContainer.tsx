@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getLatestUSData } from "../services/covidTrackingService";
+import {
+  getLatestUSData,
+  getStateMetadata,
+  getLatestStateData,
+} from "../services/covidTrackingService";
 import get from "lodash.get";
 import ScaleChart from "./ScaleChart";
 
@@ -158,20 +162,52 @@ function DataContainer() {
               scaleMap.set(matchingScale.scale, [
                 ...scaleMap.get(matchingScale.scale),
                 {
-                  label: `US ${label}`,
+                  label: `US: ${label}`,
                   value: value,
                   isCovid: true,
                   source: "https://covidtracking.com/",
                 },
               ]);
             }
-
-            newChartEntries.push({
-              label: `US ${label}`,
-              value: value,
-              source: "https://covidtracking.com/",
-            });
           }
+        });
+      } catch (e) {
+        // error
+      }
+
+      try {
+        const stateMeta = await getStateMetadata();
+        console.log(stateMeta);
+
+        const stateResults = await Promise.all(
+          stateMeta.map(({ state_code }: { state_code: string }) => {
+            return getLatestStateData(state_code);
+          })
+        );
+        stateResults.forEach((stateResult: any) => {
+          const state: string = stateResult.state;
+          console.log(state);
+
+          COVID_ENTRIES.forEach(({ label, dataKey }) => {
+            const value = get(stateResult, dataKey);
+
+            if (typeof value === "number") {
+              const matchingScale = reversedImpactScales.find(
+                (scale) => value >= scale.scale
+              );
+              if (matchingScale) {
+                scaleMap.set(matchingScale.scale, [
+                  ...scaleMap.get(matchingScale.scale),
+                  {
+                    label: `${state}: ${label}`,
+                    value: value,
+                    isCovid: true,
+                    source: "https://covidtracking.com/",
+                  },
+                ]);
+              }
+            }
+          });
         });
       } catch (e) {
         // error

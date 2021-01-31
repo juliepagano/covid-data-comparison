@@ -34,6 +34,38 @@ export async function getLatestUSData() {
   throw new Error("Unable to load latest US data.");
 }
 
+async function getStateDataByDate(state: string, date: Date) {
+  const formattedDate = formatDate(date, "yyyy-MM-dd");
+  return axios.get(
+    `${BASE_URL}/states/${state.toLowerCase()}/${formattedDate}.json`
+  );
+}
+
+export async function getLatestStateData(state: string) {
+  const currentDate = new Date();
+
+  let res;
+  try {
+    // Try today
+    res = await getStateDataByDate(state, currentDate);
+  } catch (e) {
+    if (e?.response?.status === 404) {
+      // Try yesterday if today is not ready yet
+      try {
+        res = await getStateDataByDate(state, subDays(currentDate, 1));
+      } catch (e) {
+        // do something
+      }
+    }
+  }
+
+  if (res?.data?.data) {
+    return res?.data?.data;
+  }
+
+  throw new Error(`Unable to load latest ${state} data.`);
+}
+
 export async function getStateMetadata() {
   let res;
   try {
