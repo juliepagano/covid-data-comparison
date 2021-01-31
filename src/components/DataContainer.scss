@@ -1,3 +1,5 @@
 .DataCharts {
-  display: flex;
+  > div {
+    display: flex;
+  }
 }

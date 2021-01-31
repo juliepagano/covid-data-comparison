@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 import numbro from "numbro";
+import cx from "classnames";
 
 import "./SquareChart.scss";
 
@@ -9,6 +10,7 @@ interface SquareChartProps {
   source?: string;
   scaleValue: number;
   color?: string;
+  highlight?: boolean;
   minWidth?: number;
   maxWidth?: number;
 }
@@ -38,6 +40,7 @@ function SquareChart({
   source,
   scaleValue,
   color,
+  highlight,
   minWidth = 250,
   maxWidth = 500,
 }: SquareChartProps) {
@@ -81,7 +84,7 @@ function SquareChart({
           <Fragment key={boxIndex}>
             <rect
               fill={color}
-              fillOpacity={0.2}
+              fillOpacity={0.5}
               stroke="#000"
               strokeWidth={BOX_STROKE_WIDTH}
               width={BOX_SIZE_PX}
@@ -166,7 +169,7 @@ function SquareChart({
   return (
     <figure className="SquareChart" style={{ minWidth }}>
       <figcaption>
-        <span>
+        <span className={cx({ highlight: highlight })}>
           {label} (
           {numbro(value).format({
             thousandSeparated: true,
