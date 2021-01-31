@@ -5,9 +5,7 @@ import {
   getLatestStateData,
 } from "../services/covidTrackingService";
 import get from "lodash.get";
-import ScaleChart from "./ScaleChart";
-
-import "./DataContainer.scss";
+import DataCharts from "./DataCharts";
 
 const COVID_ENTRIES = [
   {
@@ -136,8 +134,16 @@ const IMPACT_SCALES: ImpactScale[] = [
 
 const reversedImpactScales = [...IMPACT_SCALES].reverse();
 
-function DataContainer() {
+interface DataContainerProps {
+  showStates: boolean;
+  showUS: boolean;
+}
+
+function DataContainer({ showStates, showUS }: DataContainerProps) {
   const [chartScales, setChartScales] = useState<ImpactScale[]>();
+  const [filteredChartScales, setFilteredChartScales] = useState<
+    ImpactScale[]
+  >();
 
   useEffect(() => {
     async function fetchData() {
@@ -145,8 +151,6 @@ function DataContainer() {
         result.set(scale, []);
         return result;
       }, new Map());
-
-      const newChartEntries: ChartEntry[] = [];
 
       try {
         const usResult = await getLatestUSData();
@@ -165,6 +169,7 @@ function DataContainer() {
                   label: `US: ${label}`,
                   value: value,
                   isCovid: true,
+                  dataType: "US_COVID",
                   source: "https://covidtracking.com/",
                 },
               ]);
@@ -177,7 +182,6 @@ function DataContainer() {
 
       try {
         const stateMeta = await getStateMetadata();
-        console.log(stateMeta);
 
         const stateResults = await Promise.all(
           stateMeta.map(({ state_code }: { state_code: string }) => {
@@ -186,7 +190,6 @@ function DataContainer() {
         );
         stateResults.forEach((stateResult: any) => {
           const state: string = stateResult.state;
-          console.log(state);
 
           COVID_ENTRIES.forEach(({ label, dataKey }) => {
             const value = get(stateResult, dataKey);
@@ -202,6 +205,7 @@ function DataContainer() {
                     label: `${state}: ${label}`,
                     value: value,
                     isCovid: true,
+                    dataType: "STATE_COVID",
                     source: "https://covidtracking.com/",
                   },
                 ]);
@@ -231,28 +235,37 @@ function DataContainer() {
     fetchData();
   }, []);
 
-  if (!chartScales) {
+  useEffect(() => {
+    if (!chartScales) {
+      return;
+    }
+
+    const allowedDataTypes: ChartEntry["dataType"][] = ["OTHER"];
+    if (showStates) {
+      allowedDataTypes.push("STATE_COVID");
+    }
+    if (showUS) {
+      allowedDataTypes.push("US_COVID");
+    }
+
+    const newFilteredChartScales = chartScales.map(
+      ({ entries, ...otherScale }) => {
+        return {
+          ...otherScale,
+          entries: entries.filter(({ dataType = "OTHER" }) => {
+            return allowedDataTypes.includes(dataType);
+          }),
+        };
+      }
+    );
+    setFilteredChartScales(newFilteredChartScales);
+  }, [chartScales, showStates, showUS]);
+
+  if (!filteredChartScales) {
     return null;
   }
 
-  return (
-    <div className="DataCharts">
-      {chartScales.map(({ color, scale, entries }) => {
-        if (!entries.length) {
-          return null;
-        }
-
-        return (
-          <ScaleChart
-            key={scale}
-            color={color}
-            scale={scale}
-            entries={entries}
-          />
-        );
-      })}
-    </div>
-  );
+  return <DataCharts chartScales={filteredChartScales} />;
 }
 
 export default DataContainer;

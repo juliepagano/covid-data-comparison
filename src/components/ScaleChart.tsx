@@ -15,7 +15,7 @@ const ScaleChart = ({ entries, scale, color }: ScaleChartProps) => {
           mantissa: 0,
         })}
       </h2>
-      {entries.map(({ label, isCovid, ...otherEntry }) => {
+      {entries.map(({ label, isCovid, dataType, ...otherEntry }) => {
         return (
           <SquareChart
             key={label}

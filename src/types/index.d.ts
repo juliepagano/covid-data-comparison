@@ -27,6 +27,7 @@ interface ChartEntry {
   value: number;
   isCovid?: boolean;
   source?: string;
+  dataType?: "STATE_COVID" | "US_COVID" | "OTHER";
 }
 
 interface ImpactScale {
