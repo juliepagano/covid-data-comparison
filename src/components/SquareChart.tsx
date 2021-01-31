@@ -54,14 +54,18 @@ function SquareChart({
   const sectionColumns = Math.min(maxSectionsWide, sectionCount);
   const sectionRows = Math.ceil(sectionCount / sectionColumns);
 
-  const chartWidth =
-    sectionColumns * SECTION_SIZE_PX +
-    SECTION_PADDING * (sectionColumns - 1) +
-    BOX_STROKE_WIDTH * 2;
-  const chartHeight =
-    sectionRows * SECTION_SIZE_PX +
-    SECTION_PADDING * (sectionRows - 1) +
-    BOX_STROKE_WIDTH * 2;
+  // const chartWidth =
+  //   sectionColumns * SECTION_SIZE_PX +
+  //   SECTION_PADDING * (sectionColumns - 1) +
+  //   BOX_STROKE_WIDTH * 2;
+
+  // const chartHeight =
+  //   sectionRows * SECTION_SIZE_PX +
+  //   SECTION_PADDING * (sectionRows - 1) +
+  //   BOX_STROKE_WIDTH * 2;
+
+  let calculatedChartHeight = 0;
+  let calculatedChartWidth = 0;
 
   const renderBoxes = (
     startX: number,
@@ -70,15 +74,21 @@ function SquareChart({
     boxCount: number
   ) => {
     return [...Array(GROUP_SIZE)].map((e, boxRow) => {
-      const groupY = startY + boxRow * (BOX_SIZE_PX + BOX_PADDING);
+      const boxY = startY + boxRow * (BOX_SIZE_PX + BOX_PADDING);
 
       return [...Array(GROUP_SIZE)].map((e, boxCol) => {
-        const groupX = startX + boxCol * (BOX_SIZE_PX + BOX_PADDING);
+        const boxX = startX + boxCol * (BOX_SIZE_PX + BOX_PADDING);
         const boxIndex = startBoxIndex + boxRow * GROUP_SIZE + boxCol;
 
         if (boxIndex >= boxCount) {
           return null;
         }
+
+        calculatedChartHeight = boxY + BOX_SIZE_PX + BOX_STROKE_WIDTH;
+        calculatedChartWidth = Math.max(
+          boxX + BOX_SIZE_PX + BOX_STROKE_WIDTH,
+          calculatedChartWidth
+        );
 
         return (
           <Fragment key={boxIndex}>
@@ -89,8 +99,8 @@ function SquareChart({
               strokeWidth={BOX_STROKE_WIDTH}
               width={BOX_SIZE_PX}
               height={BOX_SIZE_PX}
-              x={groupX}
-              y={groupY}
+              x={boxX}
+              y={boxY}
               data-box-key={boxIndex}
             />
           </Fragment>
@@ -119,14 +129,14 @@ function SquareChart({
 
         return (
           <Fragment key={groupBoxIndex}>
-            <rect
+            {/* <rect
               fill="none"
               width={GROUP_SIZE_PX}
               height={GROUP_SIZE_PX}
               x={groupX}
               y={groupY}
               data-group-key={groupBoxIndex}
-            />
+            /> */}
             {renderBoxes(groupX, groupY, groupBoxIndex, boxCount)}
           </Fragment>
         );
@@ -151,20 +161,22 @@ function SquareChart({
 
         return (
           <Fragment key={sectionBoxIndex}>
-            <rect
+            {/* <rect
               fill="none"
               width={SECTION_SIZE_PX}
               height={SECTION_SIZE_PX}
               x={sectionX}
               y={sectionY}
               data-section-key={sectionBoxIndex}
-            />
+            /> */}
             {renderGroups(sectionX, sectionY, sectionBoxIndex, boxCount)}
           </Fragment>
         );
       });
     });
   };
+
+  const sections = renderSections(BOX_STROKE_WIDTH, BOX_STROKE_WIDTH);
 
   return (
     <figure className="SquareChart" style={{ minWidth }}>
@@ -183,8 +195,8 @@ function SquareChart({
           </span>
         )}
       </figcaption>
-      <svg width={chartWidth} height={chartHeight}>
-        {renderSections(BOX_STROKE_WIDTH, BOX_STROKE_WIDTH)}
+      <svg width={calculatedChartWidth} height={calculatedChartHeight}>
+        {sections}
       </svg>
     </figure>
   );

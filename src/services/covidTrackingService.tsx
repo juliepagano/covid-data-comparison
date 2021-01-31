@@ -1,6 +1,5 @@
 import axios from "axios";
 import formatDate from "date-fns/format";
-import addDays from "date-fns/addDays";
 import subDays from "date-fns/subDays";
 
 const BASE_URL = "https://api.covidtracking.com/v2beta";
