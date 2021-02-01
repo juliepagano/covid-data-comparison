@@ -20,6 +20,10 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+    - name: Set up github user
+      run: |
+        git config --global user.email "julie.pagano+CI@gmail.com"
+        git config --global user.name "Julie Pagano (CI)"
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
