@@ -191,7 +191,7 @@ function SquareChart({
     >
       {label && (
         <figcaption>
-          <span className={cx({ highlight: highlight })}>{label}</span>
+          <span className={cx({ highlight: highlight })}>{label}</span>{" "}
           {source && (
             <span className="SquareChart-source">
               [<a href={source}>source</a>]

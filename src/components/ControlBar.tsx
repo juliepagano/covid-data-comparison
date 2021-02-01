@@ -33,7 +33,7 @@ const ControlBar = ({ optionsConfig }: ControlBarProps) => {
               type="checkbox"
               name={name}
               checked={optionsConfig[name]}
-              onClick={(e) => onClickCheckbox(name, e)}
+              onChange={(e) => onClickCheckbox(name, e)}
             />
           </label>
         );
