@@ -25,5 +25,15 @@ const violence = [
     value: 168,
     source: "https://en.wikipedia.org/wiki/Oklahoma_City_bombing",
   },
+  {
+    label: "2017 Las Vegas shooting",
+    value: 60,
+    source: "https://en.wikipedia.org/wiki/2017_Las_Vegas_shooting#Fatalities",
+  },
+  {
+    label: "Triangle Shirtwaist Factory fire",
+    value: 146,
+    source: "https://en.wikipedia.org/wiki/Triangle_Shirtwaist_Factory_fire",
+  },
 ];
 export default violence;
