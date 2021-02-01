@@ -188,6 +188,7 @@ function DataContainer({ showStates, showUS }: DataContainerProps) {
             return getLatestStateData(state_code);
           })
         );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         stateResults.forEach((stateResult: any) => {
           const state: string = stateResult.state;
 
