@@ -20,10 +20,6 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - name: Set up github user
-      run: |
-        git config --global user.email "julie.pagano+CI@gmail.com"
-        git config --global user.name "Julie Pagano (CI)"
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -33,5 +29,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
 #     - run: npm test
-    - name: Build and Deploy
-      run: npm run deploy
+    - name: Build
+      run: npm run build
+    - name: Deploy
+      run: |
+        git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/juliepagano/covid-data-comparison.git
+        npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
