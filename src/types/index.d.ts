@@ -22,12 +22,14 @@ interface CovidData {
   [key: string]: unknown;
 }
 
+type DataTypes = "STATE_COVID" | "US_COVID" | "ANNUAL_DEATH_STATS" | "OTHER";
+
 interface ChartEntry {
   label: string;
   value: number;
   isCovid?: boolean;
   source?: string;
-  dataType?: "STATE_COVID" | "US_COVID" | "OTHER";
+  dataType?: DataTypes;
 }
 
 interface ImpactScale {
@@ -35,3 +37,11 @@ interface ImpactScale {
   scale: number;
   entries: ChartEntry[];
 }
+
+interface DataTypeOptions {
+  name: string;
+  label: string;
+  dataType: DataTypes;
+}
+
+type OptionsConfig = Record<string, boolean>;

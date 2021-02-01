@@ -6,6 +6,8 @@ import {
 } from "../services/covidTrackingService";
 import get from "lodash.get";
 import DataCharts from "./DataCharts";
+import annualDeathStats from "../constants/annualDeathStats";
+import dataTypeOptions from "../constants/dataTypeOptions";
 
 const COVID_ENTRIES = [
   {
@@ -43,20 +45,6 @@ const IMPACT_SCALES: ImpactScale[] = [
       },
     ],
   },
-  // {
-  //   color: "#f5e751",
-  //   scale: 100,
-  //   entries: [
-  //     {
-  //       label: "Oklahoma City Bombings",
-  //       value: 168,
-  //     },
-  //     {
-  //       label: "Jonestown",
-  //       value: 918,
-  //     },
-  //   ],
-  // },
   {
     color: "orange",
     scale: 1000,
@@ -66,20 +54,8 @@ const IMPACT_SCALES: ImpactScale[] = [
         value: 58209,
       },
       {
-        label: "US motor vehicle traffic deaths in 2019",
-        value: 37595,
-      },
-      {
         label: "9/11",
         value: 2996,
-      },
-      {
-        label: "Deaths from flu and pneumonia in 2019",
-        value: 49783,
-      },
-      {
-        label: "Deaths from homicide in 2019",
-        value: 19141,
       },
       {
         label: "Attack on Pearl Harbor",
@@ -95,11 +71,6 @@ const IMPACT_SCALES: ImpactScale[] = [
       },
     ],
   },
-  // {
-  //   color: "red",
-  //   scale: 10000,
-  //   entries: [],
-  // },
   {
     color: "black",
     scale: 100000,
@@ -107,10 +78,13 @@ const IMPACT_SCALES: ImpactScale[] = [
       {
         label: "HIV/AIDS in the US as of 2018",
         value: 700000,
+        source: "https://www.kff.org/",
       },
       {
         label: "1918 Spanish Flu in the US",
         value: 675000,
+        source:
+          "https://www.cdc.gov/flu/pandemic-resources/1918-pandemic-h1n1.html",
       },
       {
         label: "Deaths in US Civil War",
@@ -124,22 +98,21 @@ const IMPACT_SCALES: ImpactScale[] = [
         label: "US deaths in WWI",
         value: 116516,
       },
-      {
-        label: "Unintentional injury deaths in 2019",
-        value: 173040,
-      },
     ],
   },
 ];
 
 const reversedImpactScales = [...IMPACT_SCALES].reverse();
 
-interface DataContainerProps {
-  showStates: boolean;
-  showUS: boolean;
+function getMatchingScale(value: number) {
+  return reversedImpactScales.find((scale) => value >= scale.scale);
 }
 
-function DataContainer({ showStates, showUS }: DataContainerProps) {
+interface DataContainerProps {
+  optionsConfig: OptionsConfig;
+}
+
+function DataContainer({ optionsConfig }: DataContainerProps) {
   const [chartScales, setChartScales] = useState<ImpactScale[]>();
   const [filteredChartScales, setFilteredChartScales] = useState<
     ImpactScale[]
@@ -152,6 +125,24 @@ function DataContainer({ showStates, showUS }: DataContainerProps) {
         return result;
       }, new Map());
 
+      annualDeathStats.forEach(({ value, ...otherData }) => {
+        if (typeof value !== "number") {
+          return;
+        }
+        const matchingScale = getMatchingScale(value);
+        if (matchingScale) {
+          scaleMap.set(matchingScale.scale, [
+            ...scaleMap.get(matchingScale.scale),
+            {
+              ...otherData,
+              value: value,
+              isCovid: false,
+              dataType: "ANNUAL_DEATH_STATS",
+            },
+          ]);
+        }
+      });
+
       try {
         const usResult = await getLatestUSData();
 
@@ -159,9 +150,7 @@ function DataContainer({ showStates, showUS }: DataContainerProps) {
           const value = get(usResult, dataKey);
 
           if (typeof value === "number") {
-            const matchingScale = reversedImpactScales.find(
-              (scale) => value >= scale.scale
-            );
+            const matchingScale = getMatchingScale(value);
             if (matchingScale) {
               scaleMap.set(matchingScale.scale, [
                 ...scaleMap.get(matchingScale.scale),
@@ -196,9 +185,7 @@ function DataContainer({ showStates, showUS }: DataContainerProps) {
             const value = get(stateResult, dataKey);
 
             if (typeof value === "number") {
-              const matchingScale = reversedImpactScales.find(
-                (scale) => value >= scale.scale
-              );
+              const matchingScale = getMatchingScale(value);
               if (matchingScale) {
                 scaleMap.set(matchingScale.scale, [
                   ...scaleMap.get(matchingScale.scale),
@@ -242,12 +229,11 @@ function DataContainer({ showStates, showUS }: DataContainerProps) {
     }
 
     const allowedDataTypes: ChartEntry["dataType"][] = ["OTHER"];
-    if (showStates) {
-      allowedDataTypes.push("STATE_COVID");
-    }
-    if (showUS) {
-      allowedDataTypes.push("US_COVID");
-    }
+    dataTypeOptions.forEach(({ name, dataType }) => {
+      if (optionsConfig[name]) {
+        allowedDataTypes.push(dataType);
+      }
+    });
 
     const newFilteredChartScales = chartScales.map(
       ({ entries, ...otherScale }) => {
@@ -260,7 +246,7 @@ function DataContainer({ showStates, showUS }: DataContainerProps) {
       }
     );
     setFilteredChartScales(newFilteredChartScales);
-  }, [chartScales, showStates, showUS]);
+  }, [chartScales, optionsConfig]);
 
   if (!filteredChartScales) {
     return null;
