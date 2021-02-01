@@ -85,7 +85,10 @@ function SquareChart({
           return null;
         }
 
-        calculatedChartHeight = boxY + BOX_SIZE_PX + BOX_STROKE_WIDTH;
+        calculatedChartHeight = Math.max(
+          boxY + BOX_SIZE_PX + BOX_STROKE_WIDTH,
+          calculatedChartHeight
+        );
         calculatedChartWidth = Math.max(
           boxX + BOX_SIZE_PX + BOX_STROKE_WIDTH,
           calculatedChartWidth
