@@ -5,7 +5,11 @@ import dataTypeOptions from "../constants/dataTypeOptions";
 
 import "./ControlBar.scss";
 
-const ControlBar = () => {
+interface ControlBarProps {
+  optionsConfig: OptionsConfig;
+}
+
+const ControlBar = ({ optionsConfig }: ControlBarProps) => {
   const history = useHistory();
   const location = useLocation();
 
@@ -28,6 +32,7 @@ const ControlBar = () => {
             <input
               type="checkbox"
               name={name}
+              checked={optionsConfig[name]}
               onClick={(e) => onClickCheckbox(name, e)}
             />
           </label>

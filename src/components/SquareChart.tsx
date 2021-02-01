@@ -1,11 +1,10 @@
 import React, { Fragment } from "react";
-import numbro from "numbro";
 import cx from "classnames";
 
 import "./SquareChart.scss";
 
 interface SquareChartProps {
-  label: string;
+  label?: string;
   value: number;
   source?: string;
   scaleValue: number;
@@ -13,6 +12,7 @@ interface SquareChartProps {
   highlight?: boolean;
   minWidth?: number;
   maxWidth?: number;
+  layout?: "inline" | "stack";
 }
 
 // Box size in pixels
@@ -43,6 +43,7 @@ function SquareChart({
   highlight,
   minWidth = 250,
   maxWidth = 500,
+  layout = "stack",
 }: SquareChartProps) {
   const boxCount = Math.ceil(value / scaleValue);
   const maxSectionsWide = Math.floor(
@@ -179,22 +180,22 @@ function SquareChart({
   const sections = renderSections(BOX_STROKE_WIDTH, BOX_STROKE_WIDTH);
 
   return (
-    <figure className="SquareChart" style={{ minWidth }}>
-      <figcaption>
-        <span className={cx({ highlight: highlight })}>
-          {label} (
-          {numbro(value).format({
-            thousandSeparated: true,
-            mantissa: 0,
-          })}
-          ){" "}
-        </span>
-        {source && (
-          <span className="SquareChart-source">
-            [<a href={source}>source</a>]
-          </span>
-        )}
-      </figcaption>
+    <figure
+      className={cx("SquareChart", {
+        [layout]: layout,
+      })}
+      style={{ minWidth }}
+    >
+      {label && (
+        <figcaption>
+          <span className={cx({ highlight: highlight })}>{label}</span>
+          {source && (
+            <span className="SquareChart-source">
+              [<a href={source}>source</a>]
+            </span>
+          )}
+        </figcaption>
+      )}
       <svg width={calculatedChartWidth} height={calculatedChartHeight}>
         {sections}
       </svg>

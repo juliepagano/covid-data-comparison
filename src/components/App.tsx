@@ -25,11 +25,15 @@ function App() {
     setOptionsConfig(newOptionsConfig);
   }, [location]);
 
+  if (!optionsConfig) {
+    return null;
+  }
+
   return (
     <div className="App">
-      <ControlBar />
+      <ControlBar optionsConfig={optionsConfig} />
       <div className="App-content">
-        {optionsConfig && <DataContainer optionsConfig={optionsConfig} />}
+        <DataContainer optionsConfig={optionsConfig} />
       </div>
     </div>
   );

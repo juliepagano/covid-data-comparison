@@ -8,6 +8,8 @@ interface DataChartsProps {
 }
 
 const DataCharts = ({ chartScales }: DataChartsProps) => {
+  let prevScale: Omit<ImpactScale, "entries">;
+
   return (
     <div className="DataCharts">
       {chartScales.map(({ color, scale, entries }) => {
@@ -15,14 +17,22 @@ const DataCharts = ({ chartScales }: DataChartsProps) => {
           return null;
         }
 
-        return (
+        const scaleChart = (
           <ScaleChart
             key={scale}
             color={color}
             scale={scale}
             entries={entries}
+            prevScale={prevScale}
           />
         );
+
+        prevScale = {
+          color,
+          scale,
+        };
+
+        return scaleChart;
       })}
     </div>
   );

@@ -167,12 +167,15 @@ function DataContainer({ optionsConfig }: DataContainerProps) {
     });
 
     const newFilteredChartScales = chartScales.map(
-      ({ entries, ...otherScale }) => {
+      ({ entries, scale, ...otherScale }, index) => {
+        const filteredEntries = entries.filter(({ dataType = "OTHER" }) => {
+          return allowedDataTypes.includes(dataType);
+        });
+
         return {
           ...otherScale,
-          entries: entries.filter(({ dataType = "OTHER" }) => {
-            return allowedDataTypes.includes(dataType);
-          }),
+          scale,
+          entries: filteredEntries,
         };
       }
     );
