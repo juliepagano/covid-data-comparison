@@ -7,7 +7,12 @@ import {
 import get from "lodash.get";
 import DataCharts from "./DataCharts";
 import annualDeathStats from "../constants/annualDeathStats";
+import otherPandemics from "../constants/otherPandemics";
 import dataTypeOptions from "../constants/dataTypeOptions";
+import violence from "../constants/violence";
+import wars from "../constants/wars";
+import naturalDisasters from "../constants/naturalDisasters";
+import IMPACT_SCALES from "../constants/impactScales";
 
 const COVID_ENTRIES = [
   {
@@ -17,88 +22,6 @@ const COVID_ENTRIES = [
   {
     label: "Today's deaths from Covid",
     dataKey: "outcomes.death.total.calculated.change_from_prior_day",
-  },
-];
-
-const IMPACT_SCALES: ImpactScale[] = [
-  {
-    color: "green",
-    scale: 1,
-    entries: [],
-  },
-  {
-    color: "blue",
-    scale: 10,
-    entries: [
-      {
-        label: "Oklahoma City Bombings",
-        value: 168,
-      },
-      {
-        label: "Jonestown",
-        value: 918,
-      },
-      { label: "Columbine", value: 15 },
-      {
-        label: "Waco siege",
-        value: 86,
-      },
-    ],
-  },
-  {
-    color: "orange",
-    scale: 1000,
-    entries: [
-      {
-        label: "US deaths in Vietnam War",
-        value: 58209,
-      },
-      {
-        label: "9/11",
-        value: 2996,
-      },
-      {
-        label: "Attack on Pearl Harbor",
-        value: 2467,
-      },
-      {
-        label: "Hurricane Katrina",
-        value: 1833,
-      },
-      {
-        label: "US deaths in Iraq War",
-        value: 4497,
-      },
-    ],
-  },
-  {
-    color: "black",
-    scale: 100000,
-    entries: [
-      {
-        label: "HIV/AIDS in the US as of 2018",
-        value: 700000,
-        source: "https://www.kff.org/",
-      },
-      {
-        label: "1918 Spanish Flu in the US",
-        value: 675000,
-        source:
-          "https://www.cdc.gov/flu/pandemic-resources/1918-pandemic-h1n1.html",
-      },
-      {
-        label: "Deaths in US Civil War",
-        value: 655000,
-      },
-      {
-        label: "US deaths in WWII",
-        value: 405399,
-      },
-      {
-        label: "US deaths in WWI",
-        value: 116516,
-      },
-    ],
   },
 ];
 
@@ -125,23 +48,31 @@ function DataContainer({ optionsConfig }: DataContainerProps) {
         return result;
       }, new Map());
 
-      annualDeathStats.forEach(({ value, ...otherData }) => {
-        if (typeof value !== "number") {
-          return;
-        }
-        const matchingScale = getMatchingScale(value);
-        if (matchingScale) {
-          scaleMap.set(matchingScale.scale, [
-            ...scaleMap.get(matchingScale.scale),
-            {
-              ...otherData,
-              value: value,
-              isCovid: false,
-              dataType: "ANNUAL_DEATH_STATS",
-            },
-          ]);
-        }
-      });
+      const processData = (dataToProcess: ChartEntry[], dataType: string) => {
+        dataToProcess.forEach(({ value, ...otherData }) => {
+          if (typeof value !== "number") {
+            return;
+          }
+          const matchingScale = getMatchingScale(value);
+          if (matchingScale) {
+            scaleMap.set(matchingScale.scale, [
+              ...scaleMap.get(matchingScale.scale),
+              {
+                ...otherData,
+                value: value,
+                isCovid: false,
+                dataType: dataType,
+              },
+            ]);
+          }
+        });
+      };
+
+      processData(annualDeathStats, "ANNUAL_DEATH_STATS");
+      processData(otherPandemics, "OTHER_PANDEMICS");
+      processData(violence, "VIOLENCE");
+      processData(wars, "WARS");
+      processData(naturalDisasters, "NATURAL_DISASTERS");
 
       try {
         const usResult = await getLatestUSData();

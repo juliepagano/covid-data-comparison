@@ -22,7 +22,15 @@ interface CovidData {
   [key: string]: unknown;
 }
 
-type DataTypes = "STATE_COVID" | "US_COVID" | "ANNUAL_DEATH_STATS" | "OTHER";
+type DataTypes =
+  | "STATE_COVID"
+  | "US_COVID"
+  | "ANNUAL_DEATH_STATS"
+  | "OTHER_PANDEMICS"
+  | "VIOLENCE"
+  | "WARS"
+  | "NATURAL_DISASTERS"
+  | "OTHER";
 
 interface ChartEntry {
   label: string;
