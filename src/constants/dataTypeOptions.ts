@@ -15,12 +15,12 @@ const dataTypeOptions: DataTypeOptions[] = [
     dataType: "ANNUAL_DEATH_STATS",
   },
   {
-    label: "Other pandemics",
+    label: "Other Pandemics",
     name: "showPandemics",
     dataType: "OTHER_PANDEMICS",
   },
   {
-    label: "Wars",
+    label: "Wars and Military",
     name: "showWars",
     dataType: "WARS",
   },
