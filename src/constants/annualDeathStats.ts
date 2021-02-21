@@ -19,5 +19,20 @@ const annualDeathStats = [
     value: 173040,
     source: "https://www.cdc.gov/nchs/fastats/accidental-injury.htm",
   },
+  {
+    label: "Deaths from heart disease in 2019",
+    value: 659041,
+    source: "https://www.cdc.gov/nchs/fastats/deaths.htm",
+  },
+  {
+    label: "Deaths from cancer in 2019",
+    value: 599601,
+    source: "https://www.cdc.gov/nchs/fastats/deaths.htm",
+  },
+  {
+    label: "Total deaths in 2019",
+    value: 2854838,
+    source: "https://www.cdc.gov/nchs/fastats/deaths.htm",
+  },
 ];
 export default annualDeathStats;
